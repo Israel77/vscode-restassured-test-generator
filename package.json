@@ -11,9 +11,20 @@
         "commands": [
             {
                 "command": "restassured-test-generator.openTestGenerator",
-                "title": "Open RestAssured Test Generator"
+                "title": "Open RestAssured Test Generator",
+                "icon": "$(beaker)"
             }
-        ]
+        ],
+        "menus": {
+            "editor/title": [
+                {
+                    "when": "resourceLangId == java",
+                    "command": "restassured-test-generator.openTestGenerator",
+                    "alt": "API Test generator",
+                    "group": "navigation"
+                }
+            ]
+        }
     },
     "scripts": {
         "vscode:prepublish": "npm run package",

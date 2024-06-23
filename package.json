@@ -20,7 +20,6 @@
                 {
                     "when": "resourceLangId == java",
                     "command": "restassured-test-generator.openTestGenerator",
-                    "alt": "API Test generator",
                     "group": "navigation"
                 }
             ]

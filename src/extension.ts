@@ -1,5 +1,5 @@
 import { commands, ExtensionContext } from "vscode";
-import { TestGeneratorPanel } from "./panels/HelloWorldPanel";
+import { TestGeneratorPanel } from "./panels/TestGeneratorPanel";
 
 export function activate(context: ExtensionContext) {
     // Create the show hello world command

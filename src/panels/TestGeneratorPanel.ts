@@ -107,17 +107,27 @@ export class TestGeneratorPanel {
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource} ;script-src 'nonce-${nonce}';">
+            <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource}; script-src 'nonce-${nonce}';">
             <link href="${stylesUri}" rel="stylesheet">
             <title>RestAssured Test Generator</title>
         </head>
         <body>
-            <h1>Test generator</h1>
             <section class="app-container">
             <section class="container">
-                <div>
-                <vscode-text-area cols=40 id="input-json" resize="both" placeholder="Insert your JSON here" autofocus></vscode-text-area>
+                <div id="url-container">
+                <vscode-dropdown id="http-method">
+                    <vscode-option>GET</vscode-option>
+                    <vscode-option>POST</vscode-option>
+                    <vscode-option>PUT</vscode-option>
+                    <vscode-option>DELETE</vscode-option>
+                    <vscode-option>PATCH</vscode-option>
+                    <vscode-option>HEAD</vscode-option>
+                    <vscode-option>OPTIONS</vscode-option>
+                </vscode-dropdown>
+                <vscode-text-field id="input-url" placeholder="URL"></vscode-text-field>
+                <vscode-text-field size=3 id="status-code" placeholder="Status code"></vscode-text-field>
                 </div>
+                <vscode-text-area cols=40 id="input-json" resize="both" placeholder="Insert your JSON here" autofocus></vscode-text-area>
             </section>
             <section class="container">
                 <vscode-checkbox id="simplify-output" checked> Generate simplified tests </vscode-checkbox>

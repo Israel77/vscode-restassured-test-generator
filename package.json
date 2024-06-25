@@ -2,7 +2,7 @@
     "name": "vscode-restassured-test-generator",
     "displayName": "restassured-test-generator",
     "description": "A VSCode extension to generate tests for RestAssured based on a given JSON response",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "publisher": "IsraelBatista",
     "author": {
         "name": "Israel Batista"
@@ -48,6 +48,7 @@
         "@typescript-eslint/eslint-plugin": "^5.42.0",
         "@typescript-eslint/parser": "^5.42.0",
         "esbuild": "^0.16.10",
+        "esbuild-plugin-copy": "^2.1.1",
         "eslint": "^8.26.0",
         "glob": "^8.0.3",
         "prettier": "^2.8.1",
@@ -55,7 +56,6 @@
     },
     "dependencies": {
         "@vscode/webview-ui-toolkit": "^1.2.2",
-        "esbuild-plugin-copy": "^2.1.1",
-        "restassured-test-generator": "^0.0.3"
+        "restassured-test-generator": "^0.0.6"
     }
 }

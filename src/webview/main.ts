@@ -11,50 +11,94 @@ import {
 import { Compiler, VarOrValue } from "restassured-test-generator";
 import { CompilerOptions } from "restassured-test-generator/types/compiler/compiler"
 import { HTTPMethod } from "restassured-test-generator/types/compiler/generator";
+import { ViewState } from "./types";
 
 provideVSCodeDesignSystem().register(allComponents);
 
 window.addEventListener("load", main);
 
-const options: CompilerOptions = {};
+const vsCode = acquireVsCodeApi();
+
+// Syncs the current state
+setInterval(updateState, 100);
 
 // Main function that gets executed once the webview DOM loads
 function main() {
     const generateTestsButton = document.getElementById("generate-tests") as Button;
 
     generateTestsButton?.addEventListener("click", generateTests);
+
+    loadStateToView();
 }
 
 
 function generateTests() {
-    const inputTextArea = document.getElementById("input-json") as TextArea;
-    const outputTestsElement = document.getElementById("output-tests") as HTMLPreElement;
+    const viewState = vsCode.getState() as ViewState;
 
-    if (inputTextArea?.value.trim()) {
+    if (viewState.inputJson) {
         console.log("Generating tests...");
-        updateOptions();
 
-        const tests = Compiler.compile(inputTextArea.value, options);
-        outputTestsElement.textContent = tests ?? outputTestsElement.textContent;
+        const tests = Compiler.compile(viewState.inputJson, viewState.compilerOptions);
+        vsCode.setState({
+            ...viewState,
+            outputTests: tests
+        })
         console.log("Tests generated!");
+        loadStateToView();
     }
 }
 
-function updateOptions() {
+function updateState() {
+    console.log("Updating state...")
     const simplifyOutputCheckbox = document.getElementById("simplify-output") as Checkbox;
     const httpMethodDropdown = document.getElementById("http-method") as Dropdown;
     const urlInputTextField = document.getElementById("input-url") as TextField;
     const statusCodeInputTextField = document.getElementById("status-code") as TextField;
+    const inputTextArea = document.getElementById("input-json") as TextArea;
+    const outputTestsElement = document.getElementById("output-tests") as HTMLPreElement;
 
-    options.simplify = simplifyOutputCheckbox.checked;
+    const viewState: ViewState = vsCode.getState() || {};
 
-    if (httpMethodDropdown.value && urlInputTextField?.value.trim()) {
-        options.generatorOptions = options.generatorOptions ?? {};
-        options.generatorOptions.request = options.generatorOptions.request ?? {};
+    viewState.inputJson = inputTextArea.value ?? "";
+    viewState.outputTests = outputTestsElement.textContent ?? "";
 
-        options.generatorOptions.request.method = httpMethodDropdown.value as HTTPMethod;
-        options.generatorOptions.request.url = new VarOrValue(urlInputTextField.value.trim()).asValue();
-        options.generatorOptions.statusCode = parseInt(statusCodeInputTextField.value.trim());
-    }
+    viewState.compilerOptions ??= {};
+    viewState.compilerOptions.simplify = simplifyOutputCheckbox.checked;
 
+    viewState.compilerOptions.generatorOptions ??= {};
+    viewState.compilerOptions.generatorOptions.statusCode = parseInt(statusCodeInputTextField.value.trim());
+
+    viewState.compilerOptions.generatorOptions.request ??= {};
+    viewState.compilerOptions.generatorOptions.request.method = httpMethodDropdown.value as HTTPMethod;
+    viewState.compilerOptions.generatorOptions.request.url = new VarOrValue(urlInputTextField.value.trim()).asValue()
+
+    console.log("New state: ")
+    console.log(viewState);
+
+    vsCode.setState(viewState);
+}
+
+function loadStateToView() {
+    const viewState = vsCode.getState() as ViewState | undefined;
+
+    if (viewState === undefined)
+        return;
+
+    const simplifyOutputCheckbox = document.getElementById("simplify-output") as Checkbox;
+    const httpMethodDropdown = document.getElementById("http-method") as Dropdown;
+    const urlInputTextField = document.getElementById("input-url") as TextField;
+    const statusCodeInputTextField = document.getElementById("status-code") as TextField;
+    const inputTextArea = document.getElementById("input-json") as TextArea;
+    const outputTestsElement = document.getElementById("output-tests") as HTMLPreElement;
+
+    inputTextArea.value = viewState.inputJson ?? "";
+    outputTestsElement.textContent = viewState.outputTests ?? "Your tests will appear here";
+
+    simplifyOutputCheckbox.checked = viewState.compilerOptions?.simplify ?? true;
+
+    statusCodeInputTextField.value = viewState.compilerOptions?.generatorOptions?.statusCode?.toString() ?? "";
+
+    httpMethodDropdown.value = viewState.compilerOptions?.generatorOptions?.request?.method || "GET";
+
+    urlInputTextField.value = viewState.compilerOptions?.generatorOptions?.request?.url?.asVar().unwrap() ?? "";
 }

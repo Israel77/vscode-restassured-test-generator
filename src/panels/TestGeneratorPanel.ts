@@ -98,6 +98,7 @@ export class TestGeneratorPanel {
     private _getWebviewContent(webview: Webview, extensionUri: Uri) {
         const webviewUri = getUri(webview, extensionUri, ["out", "webview.js"]);
         const stylesUri = getUri(webview, extensionUri, ["out", "styles.css"]);
+        const highlightStyleUri = getUri(webview, extensionUri, ["out", "highlight-theme.css"]);
         const nonce = getNonce();
 
         // Tip: Install the es6-string-html VS Code extension to enable code highlighting below
@@ -109,6 +110,7 @@ export class TestGeneratorPanel {
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource}; script-src 'nonce-${nonce}';">
             <link href="${stylesUri}" rel="stylesheet">
+            <link href="${highlightStyleUri}" rel="stylesheet">
             <title>RestAssured Test Generator</title>
         </head>
         <body>

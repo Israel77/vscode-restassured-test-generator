@@ -13,7 +13,11 @@ import { CompilerOptions } from "restassured-test-generator/types/compiler/compi
 import { HTTPMethod } from "restassured-test-generator/types/compiler/generator";
 import { ViewState } from "./types";
 
+import hljs from "highlight.js/lib/core";
+import java from "highlight.js/lib/languages/java"
+
 provideVSCodeDesignSystem().register(allComponents);
+hljs.registerLanguage("java", java)
 
 window.addEventListener("load", main);
 
@@ -38,10 +42,10 @@ function generateTests() {
     if (viewState.inputJson) {
         console.log("Generating tests...");
 
-        const tests = Compiler.compile(viewState.inputJson, viewState.compilerOptions);
+        const tests = Compiler.compile(viewState.inputJson, viewState.compilerOptions) as string;
         vsCode.setState({
             ...viewState,
-            outputTests: tests
+            outputTests: hljs.highlight("java", tests).value
         })
         console.log("Tests generated!");
         loadStateToView();
@@ -49,7 +53,6 @@ function generateTests() {
 }
 
 function updateState() {
-    console.log("Updating state...")
     const simplifyOutputCheckbox = document.getElementById("simplify-output") as Checkbox;
     const httpMethodDropdown = document.getElementById("http-method") as Dropdown;
     const urlInputTextField = document.getElementById("input-url") as TextField;
@@ -72,9 +75,6 @@ function updateState() {
     viewState.compilerOptions.generatorOptions.request.method = httpMethodDropdown.value as HTTPMethod;
     viewState.compilerOptions.generatorOptions.request.url = new VarOrValue(urlInputTextField.value.trim()).asValue()
 
-    console.log("New state: ")
-    console.log(viewState);
-
     vsCode.setState(viewState);
 }
 
@@ -92,7 +92,7 @@ function loadStateToView() {
     const outputTestsElement = document.getElementById("output-tests") as HTMLPreElement;
 
     inputTextArea.value = viewState.inputJson ?? "";
-    outputTestsElement.textContent = viewState.outputTests ?? "Your tests will appear here";
+    outputTestsElement.innerHTML = viewState.outputTests ?? "Your tests will appear here";
 
     simplifyOutputCheckbox.checked = viewState.compilerOptions?.simplify ?? true;
 

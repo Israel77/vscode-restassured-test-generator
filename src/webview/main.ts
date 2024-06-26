@@ -62,18 +62,34 @@ function updateState() {
 
     const viewState: ViewState = vsCode.getState() || {};
 
-    viewState.inputJson = inputTextArea.value ?? "";
+    // Input and output
+    viewState.inputJson = inputTextArea.value;
     viewState.outputTests = outputTestsElement.textContent ?? "";
 
+    // Compiler options
     viewState.compilerOptions ??= {};
     viewState.compilerOptions.simplify = simplifyOutputCheckbox.checked;
 
+    // Generator options
     viewState.compilerOptions.generatorOptions ??= {};
-    viewState.compilerOptions.generatorOptions.statusCode = parseInt(statusCodeInputTextField.value.trim());
 
+    const statusCode = parseInt(statusCodeInputTextField.value.trim());
+    if (Number.isNaN(statusCode)) {
+        viewState.compilerOptions.generatorOptions.statusCode = undefined;
+    } else {
+        viewState.compilerOptions.generatorOptions.statusCode = statusCode;
+    }
+
+    // Request specification
     viewState.compilerOptions.generatorOptions.request ??= {};
     viewState.compilerOptions.generatorOptions.request.method = httpMethodDropdown.value as HTTPMethod;
-    viewState.compilerOptions.generatorOptions.request.url = new VarOrValue(urlInputTextField.value.trim()).asValue()
+
+    const url = new VarOrValue(urlInputTextField.value.trim()).asValue();
+    if (url != "") {
+        viewState.compilerOptions.generatorOptions.request.url = url;
+    } else {
+        viewState.compilerOptions.generatorOptions.request.url = undefined;
+    }
 
     vsCode.setState(viewState);
 }

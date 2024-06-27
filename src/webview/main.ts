@@ -9,12 +9,11 @@ import {
 } from "@vscode/webview-ui-toolkit";
 
 import { Compiler, VarOrValue } from "restassured-test-generator";
-import { CompilerOptions } from "restassured-test-generator/types/compiler/compiler"
 import { HTTPMethod } from "restassured-test-generator/types/compiler/generator";
 import { ViewState } from "./types";
 
 import hljs from "highlight.js/lib/core";
-import java from "highlight.js/lib/languages/java"
+import java from "highlight.js/lib/languages/java";
 
 provideVSCodeDesignSystem().register(allComponents);
 hljs.registerLanguage("java", java)
@@ -32,23 +31,23 @@ function main() {
 
     generateTestsButton?.addEventListener("click", generateTests);
 
-    loadStateToView();
+    loadToView(vsCode.getState() as ViewState);
 }
 
-
 function generateTests() {
-    const viewState = vsCode.getState() as ViewState;
+    let viewState = vsCode.getState() as ViewState;
 
     if (viewState.inputJson) {
-        console.log("Generating tests...");
+        console.info("Generating tests...");
 
         const tests = Compiler.compile(viewState.inputJson, viewState.compilerOptions) as string;
-        vsCode.setState({
+        viewState = {
             ...viewState,
             outputTests: hljs.highlight("java", tests).value
-        })
-        console.log("Tests generated!");
-        loadStateToView();
+        }
+        console.info("Tests generated!");
+        vsCode.setState(viewState);
+        loadToView(viewState);
     }
 }
 
@@ -59,6 +58,7 @@ function updateState() {
     const statusCodeInputTextField = document.getElementById("status-code") as TextField;
     const inputTextArea = document.getElementById("input-json") as TextArea;
     const outputTestsElement = document.getElementById("output-tests") as HTMLPreElement;
+
 
     const viewState: ViewState = vsCode.getState() || {};
 
@@ -94,9 +94,7 @@ function updateState() {
     vsCode.setState(viewState);
 }
 
-function loadStateToView() {
-    const viewState = vsCode.getState() as ViewState | undefined;
-
+function loadToView(viewState?: ViewState) {
     if (viewState === undefined)
         return;
 
@@ -107,14 +105,17 @@ function loadStateToView() {
     const inputTextArea = document.getElementById("input-json") as TextArea;
     const outputTestsElement = document.getElementById("output-tests") as HTMLPreElement;
 
+    // Input and output
     inputTextArea.value = viewState.inputJson ?? "";
     outputTestsElement.innerHTML = viewState.outputTests ?? "Your tests will appear here";
 
+    // Compiler options
     simplifyOutputCheckbox.checked = viewState.compilerOptions?.simplify ?? true;
 
+    // Generator options
     statusCodeInputTextField.value = viewState.compilerOptions?.generatorOptions?.statusCode?.toString() ?? "";
 
+    // Request specification
     httpMethodDropdown.value = viewState.compilerOptions?.generatorOptions?.request?.method || "GET";
-
     urlInputTextField.value = viewState.compilerOptions?.generatorOptions?.request?.url?.asVar().unwrap() ?? "";
 }

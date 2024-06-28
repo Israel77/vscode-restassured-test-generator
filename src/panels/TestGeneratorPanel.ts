@@ -2,6 +2,8 @@ import { Disposable, Webview, WebviewPanel, window, Uri, ViewColumn } from "vsco
 import { getUri } from "../utilities/getUri";
 import { getNonce } from "../utilities/getNonce";
 
+import { RequestUrlSection } from "./request/RequestUrlSection";
+
 /**
  * This class manages the state and behavior of TestGeneratorPanel webview panels.
  *
@@ -115,29 +117,16 @@ export class TestGeneratorPanel {
         </head>
         <body>
             <section class="app-container">
-            <section class="container">
-                <div id="url-container">
-                <vscode-dropdown id="http-method">
-                    <vscode-option>GET</vscode-option>
-                    <vscode-option>POST</vscode-option>
-                    <vscode-option>PUT</vscode-option>
-                    <vscode-option>DELETE</vscode-option>
-                    <vscode-option>PATCH</vscode-option>
-                    <vscode-option>HEAD</vscode-option>
-                    <vscode-option>OPTIONS</vscode-option>
-                </vscode-dropdown>
-                <vscode-text-field id="input-url" placeholder="URL"></vscode-text-field>
-                <vscode-text-field size=3 id="status-code" placeholder="Status code"></vscode-text-field>
-                </div>
-                <vscode-text-area cols=40 id="input-json" resize="both" placeholder="Insert your JSON here" autofocus></vscode-text-area>
-            </section>
-            <section class="container">
-                <vscode-checkbox id="simplify-output" checked> Generate simplified tests </vscode-checkbox>
-                <div><vscode-button id="generate-tests">Generate tests</vscode-button></div>
-            </section>
-            <section class="output-container">
-                <pre id="output-tests"> Your tests will appear here...</pre>
-            </section>
+                <section class="container">
+                    ${RequestUrlSection}
+                </section>
+                <section class="container">
+                    <vscode-checkbox id="simplify-output" checked> Generate simplified tests </vscode-checkbox>
+                    <div><vscode-button id="generate-tests">Generate tests</vscode-button></div>
+                </section>
+                <section class="output-container">
+                    <pre id="output-tests"> Your tests will appear here...</pre>
+                </section>
             </section>
             <script type="module" nonce="${nonce}" src="${webviewUri}"></script>
         </body>

@@ -1,4 +1,4 @@
-.app-container {
+.panel-container {
     display: grid;
     width: 100vw;
     grid-template-columns: 1fr 2fr;
@@ -6,22 +6,29 @@
     margin: 20px;
 }
 
-.container {
+.v-container {
     display: flex;
     flex-direction: column;
     margin-inline: 5px;
     gap: 5px;
 }
 
-#url-container {
+.h-container {
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
 }
 
 .output-container {
     grid-row: 1 / 3;
     grid-column: 2 / 3;
+}
+
+#input-url {
+    flex: 1;
+}
+
+textarea#control {
+    min-height: 40vh;
 }
 
 #output-tests {

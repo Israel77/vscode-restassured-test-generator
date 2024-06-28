@@ -103,7 +103,6 @@ export class TestGeneratorPanel {
         const highlightStyleUri = getUri(webview, extensionUri, ["out", "highlight-theme.css"]);
         const nonce = getNonce();
 
-        // Tip: Install the es6-string-html VS Code extension to enable code highlighting below
         return /*html*/ `
         <!DOCTYPE html>
         <html lang="en">
@@ -116,11 +115,22 @@ export class TestGeneratorPanel {
             <title>RestAssured Test Generator</title>
         </head>
         <body>
-            <section class="app-container">
-                <section class="container">
+        <vscode-panels>
+            <vscode-panel-tab id="tab-1">REQUEST</vscode-panel-tab>
+            <vscode-panel-tab id="tab-2">RESPONSE</vscode-panel-tab>
+            <vscode-panel-view>
+                <section class="v-container">
+                    <h1>Request body</h1>
                     ${RequestUrlSection}
+                    <vscode-text-area cols=40 id="input-body" resize="both" placeholder="Insert your request body" autofocus></vscode-text-area>
+                    <vscode-checkbox id="is-body-variable"> Mark body as variable</vscode-checkbox>
                 </section>
-                <section class="container">
+            </vscode-panel-view>
+            <vscode-panel-view>
+            <section class="panel-container">
+                <section class="v-container">
+                    <vscode-text-area cols=40 id="input-json" resize="both" placeholder="Insert your JSON here" autofocus></vscode-text-area>
+                    <vscode-text-field size=3 id="status-code" placeholder="Status code"></vscode-text-field>
                     <vscode-checkbox id="simplify-output" checked> Generate simplified tests </vscode-checkbox>
                     <div><vscode-button id="generate-tests">Generate tests</vscode-button></div>
                 </section>
@@ -128,7 +138,10 @@ export class TestGeneratorPanel {
                     <pre id="output-tests"> Your tests will appear here...</pre>
                 </section>
             </section>
-            <script type="module" nonce="${nonce}" src="${webviewUri}"></script>
+            </vscode-panel-view>
+        </vscode-panels>
+
+        <script type="module" nonce="${nonce}" src="${webviewUri}"></script>
         </body>
         </html>
     `;

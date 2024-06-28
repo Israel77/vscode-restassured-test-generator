@@ -52,18 +52,25 @@ function generateTests() {
 }
 
 function updateState() {
+    // Input and output
+    const inputJsonTextArea = document.getElementById("input-json") as TextArea;
+    const outputTestsElement = document.getElementById("output-tests") as HTMLPreElement;
+
+    // Options
     const simplifyOutputCheckbox = document.getElementById("simplify-output") as Checkbox;
+    const statusCodeInputTextField = document.getElementById("status-code") as TextField;
+
+    // Request specification
     const httpMethodDropdown = document.getElementById("http-method") as Dropdown;
     const urlInputTextField = document.getElementById("input-url") as TextField;
-    const statusCodeInputTextField = document.getElementById("status-code") as TextField;
-    const inputTextArea = document.getElementById("input-json") as TextArea;
-    const outputTestsElement = document.getElementById("output-tests") as HTMLPreElement;
+    const inputBodyTextArea = document.getElementById("input-body") as TextArea;
+    const bodyIsVariableCheckbox = document.getElementById("is-body-variable") as Checkbox;
 
 
     const viewState: ViewState = vsCode.getState() || {};
 
     // Input and output
-    viewState.inputJson = inputTextArea.value;
+    viewState.inputJson = inputJsonTextArea.value;
     viewState.outputTests = outputTestsElement.textContent ?? "";
 
     // Compiler options
@@ -82,13 +89,22 @@ function updateState() {
 
     // Request specification
     viewState.compilerOptions.generatorOptions.request ??= {};
-    viewState.compilerOptions.generatorOptions.request.method = httpMethodDropdown.value as HTTPMethod;
 
     const url = new VarOrValue(urlInputTextField.value.trim()).asValue();
     if (url != "") {
+        viewState.compilerOptions.generatorOptions.request.method = httpMethodDropdown.value as HTTPMethod;
         viewState.compilerOptions.generatorOptions.request.url = url;
     } else {
+        viewState.compilerOptions.generatorOptions.request.method = undefined;
         viewState.compilerOptions.generatorOptions.request.url = undefined;
+    }
+
+    const requestBody = new VarOrValue(inputBodyTextArea.value.trim()).asValue() as VarOrValue;
+    const bodyIsVariable = bodyIsVariableCheckbox.checked;
+    if (requestBody && bodyIsVariable) {
+        viewState.compilerOptions.generatorOptions.request.body = requestBody.asVar().unwrap();
+    } else if (requestBody.unwrap() != "") {
+        viewState.compilerOptions.generatorOptions.request.body = requestBody.asValue().unwrap();
     }
 
     vsCode.setState(viewState);

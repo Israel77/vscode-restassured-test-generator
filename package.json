@@ -2,7 +2,7 @@
     "name": "vscode-restassured-test-generator",
     "displayName": "restassured-test-generator",
     "description": "A VSCode extension to generate tests for RestAssured based on a given JSON response",
-    "version": "0.0.3",
+    "version": "0.0.4",
     "publisher": "IsraelBatista",
     "author": {
         "name": "Israel Batista"
@@ -14,6 +14,7 @@
     "engines": {
         "vscode": "^1.75.0"
     },
+    "icon": "./assets/logo.png",
     "main": "./out/extension.js",
     "contributes": {
         "commands": [

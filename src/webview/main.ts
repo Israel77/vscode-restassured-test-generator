@@ -83,13 +83,14 @@ function updateState() {
     // Request endpoint configuration
     const httpMethodDropdown = document.getElementById("http-method") as Dropdown;
     const urlInputTextField = document.getElementById("input-url") as TextField;
+    const isUrlVariableCheckbox = document.getElementById("is-url-variable") as Checkbox;
 
     viewState.compilerOptions.generatorOptions.request ??= {};
 
     const url = urlInputTextField.value.trim();
     if (url != "") {
         viewState.compilerOptions.generatorOptions.request.method = httpMethodDropdown.value as HTTPMethod;
-        viewState.compilerOptions.generatorOptions.request.url = url;
+        viewState.compilerOptions.generatorOptions.request.url = isUrlVariableCheckbox.checked ? new Var(url) : url;
     } else {
         viewState.compilerOptions.generatorOptions.request.method = undefined;
         viewState.compilerOptions.generatorOptions.request.url = undefined;
@@ -103,7 +104,7 @@ function updateState() {
     const bodyIsVariable = bodyIsVariableCheckbox.checked;
 
     if (requestBody && bodyIsVariable) {
-        viewState.compilerOptions.generatorOptions.request.body = new Var(requestBody).unwrap();
+        viewState.compilerOptions.generatorOptions.request.body = new Var(requestBody);
     } else if (requestBody != "") {
         viewState.compilerOptions.generatorOptions.request.body = requestBody;
     } else {
@@ -139,10 +140,11 @@ function loadToView(viewState?: ViewState) {
     const urlInputTextField = document.getElementById("input-url") as TextField;
 
     httpMethodDropdown.value = viewState.compilerOptions?.generatorOptions?.request?.method || "GET";
+    const urlInput = viewState.compilerOptions?.generatorOptions?.request?.url;
     if (viewState.compilerOptions?.generatorOptions?.request?.url instanceof Var) {
-        urlInputTextField.value = (viewState.compilerOptions?.generatorOptions?.request?.url as Var).unwrap();
+        urlInputTextField.value = recreateVar(urlInput as Var).unwrap();
     } else {
-        urlInputTextField.value = (viewState.compilerOptions?.generatorOptions?.request?.url as string | undefined) ?? "";
+        urlInputTextField.value = urlInput as string | undefined ?? "";
     }
 
     // Request body
@@ -150,11 +152,22 @@ function loadToView(viewState?: ViewState) {
     const inputBodyTextArea = document.getElementById("input-body") as TextArea;
 
     const requestBody = viewState.compilerOptions?.generatorOptions?.request?.body;
-    if (viewState.compilerOptions?.generatorOptions?.request?.body instanceof Var) {
-        inputBodyTextArea.value = (requestBody as Var).unwrap();
+    if (viewState.compilerOptions?.generatorOptions?.request?.body instanceof Object) {
+        inputBodyTextArea.value = recreateVar(requestBody as Var).unwrap();
         bodyIsVariableCheckbox.checked = true;
     } else {
         inputBodyTextArea.value = (requestBody as string | undefined) ?? "";
         bodyIsVariableCheckbox.checked = false;
     }
+}
+
+/**
+ * Recreate a var from Json object.
+ * This is an auxiliary function for desserialization, as the methods are lost when serializing.
+ * 
+ * @param namedObject The object to recreate
+ * @returns 
+ */
+function recreateVar(namedObject: { name: string }): Var {
+    return new Var(namedObject.name);
 }

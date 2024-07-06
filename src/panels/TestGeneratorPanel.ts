@@ -120,8 +120,9 @@ export class TestGeneratorPanel {
             <vscode-panel-tab id="tab-2">RESPONSE</vscode-panel-tab>
             <vscode-panel-view>
                 <section class="v-container">
-                    <h1>Request body</h1>
+                    <h1>Request method and url</h1>
                     ${RequestUrlSection}
+                    <h1>Request body</h1>
                     <vscode-text-area cols=40 id="input-body" resize="both" placeholder="Insert your request body" autofocus></vscode-text-area>
                     <vscode-checkbox id="is-body-variable"> Mark body as variable</vscode-checkbox>
                 </section>
@@ -129,12 +130,16 @@ export class TestGeneratorPanel {
             <vscode-panel-view>
             <section class="panel-container">
                 <section class="v-container">
+                    <h1>JSON response body (mandatory)</h1>
                     <vscode-text-area cols=40 id="input-json" resize="both" placeholder="Insert your JSON here" autofocus></vscode-text-area>
+                    <h1>Response status code</h1>
                     <vscode-text-field size=3 id="status-code" placeholder="Status code"></vscode-text-field>
+                    <h1>Options</h1>
                     <vscode-checkbox id="simplify-output" checked> Generate simplified tests </vscode-checkbox>
                     <div><vscode-button id="generate-tests">Generate tests</vscode-button></div>
                 </section>
                 <section class="output-container">
+                    <h1>Generated tests</h1>
                     <pre id="output-tests"> Your tests will appear here...</pre>
                 </section>
             </section>

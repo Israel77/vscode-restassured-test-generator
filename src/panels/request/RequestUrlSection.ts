@@ -1,5 +1,5 @@
 export const RequestUrlSection =
-    `
+/*html*/`
 <div class="h-container">
     <vscode-dropdown id="http-method">
         <vscode-option>GET</vscode-option>
@@ -11,5 +11,8 @@ export const RequestUrlSection =
         <vscode-option>OPTIONS</vscode-option>
     </vscode-dropdown>
     <vscode-text-field id="input-url" placeholder="URL"></vscode-text-field>
+</div>
+<div>
+    <vscode-checkbox id="is-url-variable"> Mark url as variable</vscode-checkbox>
 </div>
 `

@@ -52,32 +52,25 @@ function generateTests() {
 }
 
 function updateState() {
+    // Get previous state
+    const viewState: ViewState = vsCode.getState() || {};
+
     // Input and output
     const inputJsonTextArea = document.getElementById("input-json") as TextArea;
     const outputTestsElement = document.getElementById("output-tests") as HTMLPreElement;
 
-    // Options
-    const simplifyOutputCheckbox = document.getElementById("simplify-output") as Checkbox;
-    const statusCodeInputTextField = document.getElementById("status-code") as TextField;
-
-    // Request specification
-    const httpMethodDropdown = document.getElementById("http-method") as Dropdown;
-    const urlInputTextField = document.getElementById("input-url") as TextField;
-    const inputBodyTextArea = document.getElementById("input-body") as TextArea;
-    const bodyIsVariableCheckbox = document.getElementById("is-body-variable") as Checkbox;
-
-
-    const viewState: ViewState = vsCode.getState() || {};
-
-    // Input and output
     viewState.inputJson = inputJsonTextArea.value;
     viewState.outputTests = outputTestsElement.textContent ?? "";
 
     // Compiler options
+    const simplifyOutputCheckbox = document.getElementById("simplify-output") as Checkbox;
+
     viewState.compilerOptions ??= {};
     viewState.compilerOptions.simplify = simplifyOutputCheckbox.checked;
 
     // Generator options
+    const statusCodeInputTextField = document.getElementById("status-code") as TextField;
+
     viewState.compilerOptions.generatorOptions ??= {};
 
     const statusCode = parseInt(statusCodeInputTextField.value.trim());
@@ -87,7 +80,10 @@ function updateState() {
         viewState.compilerOptions.generatorOptions.statusCode = statusCode;
     }
 
-    // Request specification
+    // Request endpoint configuration
+    const httpMethodDropdown = document.getElementById("http-method") as Dropdown;
+    const urlInputTextField = document.getElementById("input-url") as TextField;
+
     viewState.compilerOptions.generatorOptions.request ??= {};
 
     const url = urlInputTextField.value.trim();
@@ -99,43 +95,66 @@ function updateState() {
         viewState.compilerOptions.generatorOptions.request.url = undefined;
     }
 
+    // Request body
+    const inputBodyTextArea = document.getElementById("input-body") as TextArea;
+    const bodyIsVariableCheckbox = document.getElementById("is-body-variable") as Checkbox;
+
     const requestBody = inputBodyTextArea.value.trim();
     const bodyIsVariable = bodyIsVariableCheckbox.checked;
+
     if (requestBody && bodyIsVariable) {
         viewState.compilerOptions.generatorOptions.request.body = new Var(requestBody).unwrap();
     } else if (requestBody != "") {
         viewState.compilerOptions.generatorOptions.request.body = requestBody;
+    } else {
+        viewState.compilerOptions.generatorOptions.request.body = undefined;
     }
 
+    // Set state
     vsCode.setState(viewState);
 }
 
 function loadToView(viewState?: ViewState) {
+    // Do nothing if there is no saved state
     if (viewState === undefined)
         return;
 
-    const simplifyOutputCheckbox = document.getElementById("simplify-output") as Checkbox;
-    const httpMethodDropdown = document.getElementById("http-method") as Dropdown;
-    const urlInputTextField = document.getElementById("input-url") as TextField;
-    const statusCodeInputTextField = document.getElementById("status-code") as TextField;
+    // Input and output
     const inputTextArea = document.getElementById("input-json") as TextArea;
     const outputTestsElement = document.getElementById("output-tests") as HTMLPreElement;
 
-    // Input and output
     inputTextArea.value = viewState.inputJson ?? "";
     outputTestsElement.innerHTML = viewState.outputTests ?? "Your tests will appear here";
 
     // Compiler options
+    const simplifyOutputCheckbox = document.getElementById("simplify-output") as Checkbox;
     simplifyOutputCheckbox.checked = viewState.compilerOptions?.simplify ?? true;
 
     // Generator options
+    const statusCodeInputTextField = document.getElementById("status-code") as TextField;
     statusCodeInputTextField.value = viewState.compilerOptions?.generatorOptions?.statusCode?.toString() ?? "";
 
     // Request specification
+    const httpMethodDropdown = document.getElementById("http-method") as Dropdown;
+    const urlInputTextField = document.getElementById("input-url") as TextField;
+
     httpMethodDropdown.value = viewState.compilerOptions?.generatorOptions?.request?.method || "GET";
     if (viewState.compilerOptions?.generatorOptions?.request?.url instanceof Var) {
         urlInputTextField.value = (viewState.compilerOptions?.generatorOptions?.request?.url as Var).unwrap();
     } else {
         urlInputTextField.value = (viewState.compilerOptions?.generatorOptions?.request?.url as string | undefined) ?? "";
+    }
+
+    // Request body
+    const bodyIsVariableCheckbox = document.getElementById("is-body-variable") as Checkbox;
+    const inputBodyTextArea = document.getElementById("input-body") as TextArea;
+
+    const requestBody = viewState.compilerOptions?.generatorOptions?.request?.body;
+    if (viewState.compilerOptions?.generatorOptions?.request?.body instanceof Var) {
+        inputBodyTextArea.value = (requestBody as Var).unwrap();
+        bodyIsVariableCheckbox.checked = true;
+    } else {
+        inputBodyTextArea.value = (requestBody as string | undefined) ?? "";
+        bodyIsVariableCheckbox.checked = false;
     }
 }

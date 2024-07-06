@@ -57,6 +57,6 @@
     "dependencies": {
         "@vscode/webview-ui-toolkit": "^1.2.2",
         "highlight.js": "^11.9.0",
-        "restassured-test-generator": "^0.0.6"
+        "restassured-test-generator": "^0.0.8"
     }
 }

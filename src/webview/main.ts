@@ -8,7 +8,7 @@ import {
     TextField
 } from "@vscode/webview-ui-toolkit";
 
-import { Compiler, VarOrValue } from "restassured-test-generator";
+import { Compiler, Var } from "restassured-test-generator/dist/index";
 import { HTTPMethod } from "restassured-test-generator/types/compiler/generator";
 import { ViewState } from "./types";
 
@@ -90,7 +90,7 @@ function updateState() {
     // Request specification
     viewState.compilerOptions.generatorOptions.request ??= {};
 
-    const url = new VarOrValue(urlInputTextField.value.trim()).asValue();
+    const url = urlInputTextField.value.trim();
     if (url != "") {
         viewState.compilerOptions.generatorOptions.request.method = httpMethodDropdown.value as HTTPMethod;
         viewState.compilerOptions.generatorOptions.request.url = url;
@@ -99,12 +99,12 @@ function updateState() {
         viewState.compilerOptions.generatorOptions.request.url = undefined;
     }
 
-    const requestBody = new VarOrValue(inputBodyTextArea.value.trim()).asValue() as VarOrValue;
+    const requestBody = inputBodyTextArea.value.trim();
     const bodyIsVariable = bodyIsVariableCheckbox.checked;
     if (requestBody && bodyIsVariable) {
-        viewState.compilerOptions.generatorOptions.request.body = requestBody.asVar().unwrap();
-    } else if (requestBody.unwrap() != "") {
-        viewState.compilerOptions.generatorOptions.request.body = requestBody.asValue().unwrap();
+        viewState.compilerOptions.generatorOptions.request.body = new Var(requestBody).unwrap();
+    } else if (requestBody != "") {
+        viewState.compilerOptions.generatorOptions.request.body = requestBody;
     }
 
     vsCode.setState(viewState);
@@ -133,5 +133,9 @@ function loadToView(viewState?: ViewState) {
 
     // Request specification
     httpMethodDropdown.value = viewState.compilerOptions?.generatorOptions?.request?.method || "GET";
-    urlInputTextField.value = viewState.compilerOptions?.generatorOptions?.request?.url?.asVar().unwrap() ?? "";
+    if (viewState.compilerOptions?.generatorOptions?.request?.url instanceof Var) {
+        urlInputTextField.value = (viewState.compilerOptions?.generatorOptions?.request?.url as Var).unwrap();
+    } else {
+        urlInputTextField.value = (viewState.compilerOptions?.generatorOptions?.request?.url as string | undefined) ?? "";
+    }
 }

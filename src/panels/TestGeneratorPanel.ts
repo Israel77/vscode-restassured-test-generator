@@ -34,6 +34,9 @@ export class TestGeneratorPanel {
 
         // Set the HTML content for the webview panel
         this._panel.webview.html = this._getWebviewContent(this._panel.webview, extensionUri);
+
+        // Set an event listener to listen for messages passed from the webview context
+        this._setWebviewMessageListener(this._panel.webview);
     }
 
     /**
@@ -150,5 +153,28 @@ export class TestGeneratorPanel {
         </body>
         </html>
     `;
+    }
+
+    /**
+     * Sets up an event listener to listen for messages passed from the webview context and
+     * executes code based on the message that is received.
+     *
+     * @param webview A reference to the extension webview
+     */
+    private _setWebviewMessageListener(webview: Webview) {
+        webview.onDidReceiveMessage(
+            (message: any) => {
+                const command = message.command;
+                const text = message.text;
+
+                switch (command) {
+                    case "showError":
+                        window.showErrorMessage(text);
+                        return;
+                }
+            },
+            undefined,
+            this._disposables
+        );
     }
 }

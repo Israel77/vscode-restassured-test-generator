@@ -40,12 +40,21 @@ function generateTests() {
     if (viewState.inputJson) {
         console.info("Generating tests...");
 
-        const tests = Compiler.compile(viewState.inputJson, viewState.compilerOptions) as string;
-        viewState = {
-            ...viewState,
-            outputTests: hljs.highlight("java", tests).value
+        try {
+            const tests = Compiler.compile(viewState.inputJson, viewState.compilerOptions) as string;
+
+            viewState = {
+                ...viewState,
+                outputTests: hljs.highlight("java", tests).value
+            }
+        } catch (error) {
+            console.error(error);
+            vsCode.postMessage({
+                command: "showError",
+                text: error.message
+            });
         }
-        console.info("Tests generated!");
+
         vsCode.setState(viewState);
         loadToView(viewState);
     }

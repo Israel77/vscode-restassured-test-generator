@@ -37,7 +37,7 @@ function main() {
 function generateTests() {
     let viewState = vsCode.getState() as ViewState;
 
-    if (viewState.inputJson) {
+    if (viewState.inputJson && viewState.inputJson.trim() !== "") {
         console.info("Generating tests...");
 
         try {
@@ -57,6 +57,11 @@ function generateTests() {
 
         vsCode.setState(viewState);
         loadToView(viewState);
+    } else {
+        vsCode.postMessage({
+            command: "showWarn",
+            text: "You must provide a valid JSON for the response body"
+        });
     }
 }
 

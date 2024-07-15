@@ -152,13 +152,16 @@ function loadToView(viewState?: ViewState) {
     // Request specification
     const httpMethodDropdown = document.getElementById("http-method") as Dropdown;
     const urlInputTextField = document.getElementById("input-url") as TextField;
+    const isUrlVariableCheckbox = document.getElementById("is-url-variable") as Checkbox;
 
     httpMethodDropdown.value = viewState.compilerOptions?.generatorOptions?.request?.method || "GET";
     const urlInput = viewState.compilerOptions?.generatorOptions?.request?.url;
-    if (viewState.compilerOptions?.generatorOptions?.request?.url instanceof Var) {
+    if (viewState.compilerOptions?.generatorOptions?.request?.url instanceof Object) {
         urlInputTextField.value = recreateVar(urlInput as Var).unwrap();
+        isUrlVariableCheckbox.checked = true;
     } else {
         urlInputTextField.value = urlInput as string | undefined ?? "";
+        isUrlVariableCheckbox.checked = false;
     }
 
     // Request body

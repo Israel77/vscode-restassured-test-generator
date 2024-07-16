@@ -31,7 +31,8 @@ function main() {
 
     generateTestsButton?.addEventListener("click", generateTests);
 
-    loadToView(vsCode.getState() as ViewState);
+    const viewState = vsCode.getState() as ViewState;
+    loadToView(viewState);
 }
 
 function generateTests() {
@@ -67,7 +68,7 @@ function generateTests() {
 
 function updateState() {
     // Get previous state
-    const viewState: ViewState = vsCode.getState() || {};
+    const viewState: ViewState = vsCode.getState() ?? {};
 
     // Input and output
     const inputJsonTextArea = document.getElementById("input-json") as TextArea;
@@ -125,6 +126,19 @@ function updateState() {
         viewState.compilerOptions.generatorOptions.request.body = undefined;
     }
 
+    // Request content type
+    const contentTypeTextField = document.getElementById("input-content-type") as TextField;
+    const isContentTypeVariableCheckbox = document.getElementById("is-content-type-variable") as Checkbox;
+
+    const contentType = contentTypeTextField.value.trim();
+    const isContentTypeVariable = isContentTypeVariableCheckbox.checked;
+
+    if (contentType && contentType !== "") {
+        viewState.compilerOptions.generatorOptions.request.contentType = isContentTypeVariable ? new Var(contentType) : contentType;
+    } else {
+        viewState.compilerOptions.generatorOptions.request.contentType = undefined;
+    }
+
     // Set state
     vsCode.setState(viewState);
 }
@@ -175,6 +189,20 @@ function loadToView(viewState?: ViewState) {
     } else {
         inputBodyTextArea.value = (requestBody as string | undefined) ?? "";
         bodyIsVariableCheckbox.checked = false;
+    }
+
+    // Request content type
+    const contentTypeTextField = document.getElementById("input-content-type") as TextField;
+    const isContentTypeVariableCheckbox = document.getElementById("is-content-type-variable") as Checkbox;
+
+    const contentType = viewState.compilerOptions?.generatorOptions?.request?.contentType;
+
+    if (viewState.compilerOptions?.generatorOptions?.request?.contentType instanceof Object) {
+        contentTypeTextField.value = recreateVar(contentType as Var).unwrap();
+        isContentTypeVariableCheckbox.checked = true;
+    } else {
+        contentTypeTextField.value = (contentType as string | undefined) ?? "";
+        isContentTypeVariableCheckbox.checked = false;
     }
 }
 

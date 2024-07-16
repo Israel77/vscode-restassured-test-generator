@@ -129,6 +129,9 @@ export class TestGeneratorPanel {
                         <h1>Request body</h1>
                         <vscode-text-area cols=40 id="input-body" resize="both" placeholder="Insert your request body" autofocus></vscode-text-area>
                         <vscode-checkbox id="is-body-variable"> Mark body as variable</vscode-checkbox>
+                        <h1>Request ContentType</h1>
+                        <vscode-text-field cols=40 id="input-content-type" resize="both" placeholder="Insert the contentType"></vscode-text-field>
+                        <vscode-checkbox id="is-content-type-variable">Mark contentType as variable</vscode-checkbox>
                     </section>
                 </vscode-panel-view>
                 <vscode-panel-view>
